@@ -9,14 +9,14 @@ const provider = new WebSocketProvider(WS_URL);
 const targetAddress = "0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af".toLowerCase();
 
 // File log
-const outputFile = "filtered_tx.txt";
+const outputFile = "filtered_tx222.txt";
 
 // ====== Tuning ======
-const BATCH_SIZE = 800;          // số hash xử lý mỗi tick
+const BATCH_SIZE = 8000;          // số hash xử lý mỗi tick
 const TICK_MS = 100;             // chu kỳ worker
-const MAX_RETRY = 10;            // số lần retry getTransaction
+const MAX_RETRY = 100;            // số lần retry getTransaction
 const BASE_BACKOFF_MS = 50;      // backoff cơ bản
-const BACKFILL_INTERVAL_MS = 2000; // chu kỳ backfill txpool_content
+const BACKFILL_INTERVAL_MS = 1000; // chu kỳ backfill txpool_content
 // =====================
 
 /** Hàng đợi hash cần fetch chi tiết */
@@ -105,7 +105,7 @@ async function backfillTxpool() {
                     let hash: string | undefined = tx?.hash;
                     if (!hash) {
                         try {
-                            hash = Transaction.from({
+                            const computedHash = Transaction.from({
                                 to: tx.to,
                                 from: tx.from,
                                 nonce: tx.nonce,
@@ -118,6 +118,7 @@ async function backfillTxpool() {
                                 chainId: tx.chainId,
                                 type: tx.type,
                             }).hash;
+                            hash = computedHash || undefined;
                         } catch { }
                     }
                     if (hash) enqueue(hash);
